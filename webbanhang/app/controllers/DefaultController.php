@@ -2,6 +2,6 @@
 class DefaultController
 {
 public function index(){
-echo "HELLO HUTECH ";
+echo "HELLO HUTECH1123123 ";
 }
 }
