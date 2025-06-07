@@ -101,4 +101,49 @@ return true;
 }
 return false;
 }
+public function getProductsPaging($search = '', $categoryId = '', $page = 1, $limit = 8)
+{
+    $offset = ($page - 1) * $limit;
+    $params = [];
+    $where = " WHERE 1=1 ";
+
+    if (!empty($search)) {
+        $where .= " AND p.name LIKE :search ";
+        $params[':search'] = "%$search%";
+    }
+    if (!empty($categoryId)) {
+        $where .= " AND p.category_id = :categoryId ";
+        $params[':categoryId'] = $categoryId;
+    }
+
+    // Đếm tổng sản phẩm phù hợp
+    $countSql = "SELECT COUNT(*) FROM " . $this->table_name . " p $where";
+    $stmt = $this->conn->prepare($countSql);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
+    $stmt->execute();
+    $total = $stmt->fetchColumn();
+
+    // Lấy danh sách sản phẩm phân trang
+    $sql = "SELECT p.id, p.name, p.description, p.price, p.image, c.name as category_name
+            FROM " . $this->table_name . " p
+            LEFT JOIN category c ON p.category_id = c.id
+            $where
+            ORDER BY p.id DESC
+            LIMIT :limit OFFSET :offset";
+
+    $stmt = $this->conn->prepare($sql);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $products = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    return ['products' => $products, 'total' => $total];
+}
+
 }
