@@ -6,8 +6,7 @@ public function __construct($db) {
 $this->conn = $db;
 }
 public function getAccountByUsername($username) {
-$query = "SELECT * FROM " . $this->table_name . " WHERE username = :username
-LIMIT 0,1";
+$query = "SELECT * FROM " . $this->table_name . " WHERE username = :username LIMIT 1";
 $stmt = $this->conn->prepare($query);
 $stmt->bindParam(":username", $username);
 $stmt->execute();

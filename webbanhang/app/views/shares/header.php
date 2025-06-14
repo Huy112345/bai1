@@ -189,10 +189,17 @@
         </li>
 
         <?php if (SessionHelper::isAdmin()): ?>
-          <li class="nav-item">
-            <a class="nav-link <?php if ($_SERVER['REQUEST_URI'] == '/webbanhang/Product/add') echo 'active'; ?>" href="/webbanhang/Product/add">Thêm sản phẩm</a>
-          </li>
-        <?php endif; ?>
+  <li class="nav-item">
+    <a class="nav-link <?php if ($_SERVER['REQUEST_URI'] == '/webbanhang/Product/add') echo 'active'; ?>" href="/webbanhang/Product/add">Thêm sản phẩm</a>
+  </li>
+<?php endif; ?>
+
+<?php if (SessionHelper::isLoggedIn()): ?>
+  <li class="nav-item">
+    <a class="nav-link <?php if ($_SERVER['REQUEST_URI'] == '/webbanhang/Product/historyOrder') echo 'active'; ?>" href="/webbanhang/Product/historyOrder">Lịch sử oder</a>
+  </li>
+<?php endif; ?>
+
 
         <!-- Giỏ hàng -->
         <li class="nav-item ms-3">
@@ -216,7 +223,7 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <?= htmlspecialchars($_SESSION['username']) ?> (<?= SessionHelper::getRole() ?>)
+              <?= htmlspecialchars($_SESSION['username'] ) ?> (<?= SessionHelper::getRole()  ?>) (<?= $_SESSION['user_id']  ?>)
             </a>
             <ul class="dropdown-menu dropdown-menu-dark">
               <li><a class="dropdown-item" href="/webbanhang/account/profile">Hồ sơ</a></li>

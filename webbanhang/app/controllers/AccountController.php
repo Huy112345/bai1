@@ -55,27 +55,27 @@ header('Location: /webbanhang/product');
 exit;
 }
 public function checkLogin() {
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-$username = $_POST['username'] ?? '';
-$password = $_POST['password'] ?? '';
-$account = $this->accountModel->getAccountByUsername($username);
-if ($account && password_verify($password, $account->password)) {
-session_start();
-if (!isset($_SESSION['username'])) {
-$_SESSION['username'] = $account->username;
-$_SESSION['role'] = $account->role;
-}
-header('Location: /webbanhang/product');
-exit;
-} else {
-$error = $account ? "Mật khẩu không đúng!" : "Không tìm thấy tài
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-khoản!";
+        $account = $this->accountModel->getAccountByUsername($username);
 
-include_once 'app/views/account/login.php';
-exit;
+        if ($account && password_verify($password, $account->password)) {
+            session_start();
+            $_SESSION['username'] = $account->username;
+            $_SESSION['user_id'] = $account->id;
+            $_SESSION['role'] = $account->role;
+            //echo($_SESSION['user_id']);
+            header('Location: /webbanhang/product');
+            exit;
+        } else {
+            $error = $account ? "Mật khẩu không đúng!" : "Không tìm thấy tài khoản!";
+            include_once 'app/views/account/login.php';
+            exit;
+        }
+    }
 }
-}
-}
+
 }
 ?>

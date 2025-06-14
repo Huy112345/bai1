@@ -3,16 +3,18 @@ require_once('app/config/database.php');
 require_once('app/models/ProductModel.php');
 require_once('app/models/CategoryModel.php');
 require_once('app/helpers/SessionHelper.php');
-
+require_once('app/models/OrderModel.php');
 class ProductController
 {
     private $productModel;
+    private $orderModel;
     private $db;
 
     public function __construct()
     {
         $this->db = (new Database())->getConnection();
         $this->productModel = new ProductModel($this->db);
+        $this->orderModel = new OrderModel($this->db);
     }
 
     private function isAdmin()
@@ -224,10 +226,20 @@ class ProductController
 
     // Trang thanh toán
     public function checkout()
-    {
+    { 
         include 'app/views/product/checkout.php';
     }
 
+    public function historyOrder()
+    {
+        $orders = $this->orderModel->getOrder($_SESSION['user_id']);
+        include 'app/views/product/historyOrder.php';
+    }
+    public function detailOrder($order_id)
+    {
+        $orders = $this->orderModel->getdetailOrder($order_id);
+        include 'app/views/product/detailOrder.php';
+    }
     // Xử lý thanh toán
     public function processCheckout()
     {
@@ -240,15 +252,21 @@ class ProductController
                 echo "Giỏ hàng trống.";
                 return;
             }
-
+            if(!isset($_SESSION['user_id']))
+            {
+                echo("Bạn chưa đăng nhập!");
+                return ;
+            }
             $this->db->beginTransaction();
 
             try {
-                $query = "INSERT INTO orders (name, phone, address) VALUES (:name, :phone, :address)";
+                $user_Id = $_SESSION['user_id'];
+                $query = "INSERT INTO orders (name, phone, address,user_id) VALUES (:name, :phone, :address , :user_Id)";
                 $stmt = $this->db->prepare($query);
                 $stmt->bindParam(':name', $name);
                 $stmt->bindParam(':phone', $phone);
                 $stmt->bindParam(':address', $address);
+                $stmt->bindParam(':user_Id', $user_Id);
                 $stmt->execute();
 
                 $order_id = $this->db->lastInsertId();
